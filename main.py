@@ -25,13 +25,15 @@ def main(params):
     # build the pose model from a config file and a checkpoint file
     pose_model = init_pose_model(
         params.pose_config, params.pose_checkpoint, device=params.device.lower())
-        
+    
+    # define the directory to store the results
     vitpose_res_name = re.split('\.',params.video_path)[0].split('\\')[-1]
     res_dir=vitpose_res_name+'_results'
     if not os.path.exists(res_dir):
         os.mkdir(res_dir)
     
-    # (I)
+    # (I) 
+    # Get the ViTPose Inference results
     if not os.path.exists(os.path.join(res_dir,'vitpose_kpt_'+vitpose_res_name+'.npz')):
         #infer keypoints from ViTPose
         kseq, size, fps = vitpose_infer.get_kpt_seq(params,params.video_path,det_model,pose_model)
@@ -53,7 +55,9 @@ def main(params):
     # save the inferred_kpt_seq
     np.savez(os.path.join(res_dir,'inferred_kpt_'+vitpose_res_name),inferred_kpt_seq=inferred_kpt_seq,missing_kpt=missing_kpt)
     
-    # (III) plot the results
+    
+    # (III) 
+    #  plot the results
     utils.view_missing_kpt(len(kseq),missing_kpt,out_path=os.path.join(res_dir,vitpose_res_name+'_occluded_pt'))
     
     # video with ViTPose result
